@@ -1,6 +1,9 @@
 // This file contains type definitions for your data.
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
+
+import { Key, ReactNode } from "react";
+
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
@@ -21,6 +24,7 @@ export type Invoice = {
   customer_id: string;
   amount: number;
   date: string;
+  quantity:number;
   // In TypeScript, this is called a string union type.
   // It means that the "status" property can only be one of the two strings: 'pending' or 'paid'.
   status: 'pending' | 'paid';
@@ -45,6 +49,11 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
 };
 
 export type InvoicesTable = {
+  quantity: ReactNode;
+  invoice_amount: any;
+  invoices_name: ReactNode;
+  id_produk: ReactNode;
+  id_invoices: Key | null | undefined;
   id: string;
   customer_id: string;
   name: string;
@@ -85,4 +94,14 @@ export type InvoiceForm = {
   customer_id: string;
   amount: number;
   status: 'pending' | 'paid';
+};
+
+export type Product = {
+  total_terjual(total_terjual: any): number;
+  id_produk: string;
+  nama_produk: string;
+  harga: number;
+  stok: number;
+  foto: string;
+  deskripsi: string;
 };

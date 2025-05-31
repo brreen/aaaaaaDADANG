@@ -3,15 +3,24 @@ import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredInvoices } from '@/app/lib/data';
+import { Invoice } from '@/app/lib/definitions';
+
+type Invoices = {
+  image_url: string
+  name: string
+  email: string
+  status: string
+  amount: number
+  date: string
+  quantity: number
+  id: string
+}
 
 export default async function InvoicesTable({
-  query,
-  currentPage,
+  invoices
 }: {
-  query: string;
-  currentPage: number;
+  invoices: Invoices[]
 }) {
-  const invoices = await fetchFilteredInvoices(query, currentPage);
 
   return (
     <div className="mt-6 flow-root">
@@ -44,6 +53,7 @@ export default async function InvoicesTable({
                     <p className="text-xl font-medium">
                       {formatCurrency(invoice.amount)}
                     </p>
+                    <p className="text-sm text-gray-500">Quantity: {invoice.quantity}</p>
                     <p>{formatDateToLocal(invoice.date)}</p>
                   </div>
                   <div className="flex justify-end gap-2">
@@ -66,6 +76,7 @@ export default async function InvoicesTable({
                 <th scope="col" className="px-3 py-5 font-medium">
                   Amount
                 </th>
+                <th scope="col" className="px-3 py-5 font-medium">Quantity</th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Date
                 </th>
@@ -100,6 +111,9 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {formatCurrency(invoice.amount)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {invoice.quantity}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {formatDateToLocal(invoice.date)}

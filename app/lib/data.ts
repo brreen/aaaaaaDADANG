@@ -6,6 +6,7 @@ import {
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
+  Product,
 } from './definitions';
 import { formatCurrency } from './utils';
 
@@ -27,6 +28,33 @@ export async function fetchRevenue() {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
+  }
+}
+export async function fetchAllInvoices() {
+  try {
+    const invoices = await sql`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.date,
+        invoices.status,
+        customers.name AS customer_name,
+        customers.email AS customer_email,
+        customers.image_url AS customer_image
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      ORDER BY invoices.date DESC
+      LIMIT 20
+    `;
+
+    // Format amount ke rupiah
+    return invoices.map((invoice) => ({
+      ...invoice,
+      amount: Number(invoice.amount) / 100, // contoh konversi dari cents ke rupiah
+    }));
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
   }
 }
 
@@ -102,6 +130,7 @@ export async function fetchFilteredInvoices(
         customers.name,
         customers.email,
         customers.image_url
+        SUM(invoice_items.quantity) AS quantity
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       WHERE
@@ -214,5 +243,161 @@ export async function fetchFilteredCustomers(query: string) {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
+  }
+}
+
+export async function fetchProducts() {
+  try {
+    const products = await sql<Product[]>`
+      SELECT
+        id_produk,
+        nama_produk,
+        harga,
+        stok,
+        foto,
+        deskripsi
+      FROM products
+      ORDER BY nama_produk ASC
+    `;
+
+    return products;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch products.');
+  }
+}
+
+// Ambil 1 produk berdasarkan ID
+export async function fetchProductById(id: string) {
+  try {
+    const data = await sql<Product[]>`
+      SELECT
+        id_produk,
+        nama_produk,
+        harga,
+        stok,
+        foto,
+        deskripsi
+      FROM products
+      WHERE id_produk = ${id}::uuid
+    `;
+
+    return data[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch product.');
+  }
+}
+
+export async function fetchMostSoldProducts() {
+  try {
+    const products = await sql<any[]>`
+        SELECT 
+        p.id_produk,
+        p.nama_produk,
+        p.harga,
+        p.stok,
+        p.foto,
+        p.deskripsi,
+        SUM(i.quantity) AS quantity
+      FROM products p
+      JOIN invoices i ON p.id_produk = i.id_produk
+      GROUP BY p.id_produk, p.nama_produk, p.harga, p.stok, p.foto, p.deskripsi
+      ORDER BY quantity DESC
+      LIMIT 3;  
+    `;
+
+    return products.map(product => ({
+      ...product,
+      quantity: Number(product.quantity),
+    }));
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch most sold products.');
+  }
+}
+
+
+
+
+
+// Tambahkan produk baru
+export async function createProduct(product: {
+  nama_produk: string;
+  harga: number;
+  stok: number;
+  foto: string;
+  deskripsi: string;
+}) {
+  try {
+    const result = await sql<Product[]>`
+      INSERT INTO products (nama_produk, harga, stok, foto, deskripsi)
+      VALUES (${product.nama_produk}, ${product.harga}, ${product.stok}, ${product.foto}, ${product.deskripsi})
+      RETURNING *
+    `;
+
+    return result[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to create product.');
+  }
+}
+
+// Hapus produk berdasarkan ID
+export async function deleteProductById(id: string) {
+  try {
+    await sql`DELETE FROM products WHERE id_produk = ${id}::uuid`;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to delete product.');
+  }
+}
+
+export async function fetchInvoices(): Promise<any[]> {
+  try {
+    const invoices = await sql`
+      SELECT
+        invoices.id,
+        invoices.customer_id,
+        customers.name,
+        customers.email,
+        customers.image_url,
+        invoices.date,
+        invoices.amount,
+        invoices.status,
+        products.nama_produk,
+        invoices.quantity
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      JOIN invoice_items ON invoice_items.invoice_id = invoices.id
+      JOIN products ON invoice_items.product_id = products.id_produk
+      ORDER BY invoices.date DESC
+      LIMIT 20
+    `;
+    return invoices;
+  } catch (error) {
+    console.error('Database error fetching invoices:', error);
+    throw new Error('Failed to fetch invoices');
+  }
+}
+
+export async function fetchTopProducts() {
+  try {
+    const products = await sql<Product[]>`
+      SELECT
+        id_produk,
+        nama_produk,
+        harga,
+        stok,
+        foto,
+        deskripsi
+      FROM products
+      ORDER BY stok DESC
+      LIMIT 3
+    `;
+    return products;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch top products.');
   }
 }
