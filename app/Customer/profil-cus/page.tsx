@@ -1,8 +1,8 @@
-// app/Customer/Profil-cus/CustomerProfilPage.tsx
 'use client';
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 export default function CustomerProfilPage() {
   const router = useRouter();
@@ -12,11 +12,14 @@ export default function CustomerProfilPage() {
     email: 'Dadangg@gmail.com',
     phone: '0812-3456-7890',
     address: 'Bekasi',
-    avatar: '/Profil.jpeg',
+    avatar: '/profilad.jpg',
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // Hapus data login (misalnya token)
+    localStorage.removeItem('token'); // atau sessionStorage/session cookie sesuai implementasi kamu
+
+    // Redirect ke halaman login
     router.push('/Auth/Login');
   };
 
@@ -44,12 +47,12 @@ export default function CustomerProfilPage() {
           <p className="text-gray-500">{customer.phone}</p>
         </div>
       </div>
-
       <div className="mt-6">
         <h2 className="text-gray-700 font-semibold mb-2">Alamat</h2>
         <p className="text-gray-600">{customer.address}</p>
       </div>
 
+      {/* Tombol Logout */}
       <div className="mt-8 text-right">
         <button
           onClick={handleLogout}

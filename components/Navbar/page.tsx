@@ -68,9 +68,9 @@ export default function Navbar() {
 
       {/* Search + Profile kanan */}
       <div className="flex items-center space-x-6">
-        <Link href="/Customer/Profil-cus" aria-label="Profile">
+        <Link href="/Customer/profil-cus" aria-label="Profile">
           <Image
-            src="/Profil.jpeg"
+            src="/profilad.jpg"
             alt="User Profile"
             width={36}
             height={36}
