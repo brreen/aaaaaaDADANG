@@ -49,20 +49,17 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
 };
 
 export type InvoicesTable = {
-  quantity: ReactNode;
-  invoice_amount: any;
-  invoices_name: ReactNode;
-  id_produk: ReactNode;
-  id_invoices: Key | null | undefined;
   id: string;
-  customer_id: string;
+  amount: number;
+  date: string;
+  status: 'pending' | 'paid';
   name: string;
   email: string;
   image_url: string;
-  date: string;
-  amount: number;
-  status: 'pending' | 'paid';
+  quantity: number;   // hasil SUM dari invoice_items.quantity
+  customer_id?: string;  // jika diperlukan
 };
+
 
 export type CustomersTableType = {
   id: string;
@@ -104,4 +101,14 @@ export type Product = {
   stok: number;
   foto: string;
   deskripsi: string;
+};
+
+export type ProductField = {
+  foto: any;
+  deskripsi: string | number | readonly string[] | undefined;
+  stok: string | number | readonly string[] | undefined;
+  harga: number;
+
+  id_produk: string;
+  nama_produk: string;
 };

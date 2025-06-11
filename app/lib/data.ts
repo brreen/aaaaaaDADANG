@@ -1,5 +1,6 @@
 import postgres from 'postgres';
 import {
+  ProductField,
   CustomerField,
   CustomersTableType,
   InvoiceForm,
@@ -9,7 +10,7 @@ import {
   Product,
 } from './definitions';
 import { formatCurrency } from './utils';
-
+const ITEMS_PER_PAGE = 10;
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 export async function fetchRevenue() {
@@ -113,14 +114,15 @@ export async function fetchCardData() {
   }
 }
 
-const ITEMS_PER_PAGE = 6;
+
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
-) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
+): Promise<InvoicesTable[]> {
   try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+    const minItemsPerPage = Math.max(ITEMS_PER_PAGE, 10);
+
     const invoices = await sql<InvoicesTable[]>`
       SELECT
         invoices.id,
@@ -129,18 +131,31 @@ export async function fetchFilteredInvoices(
         invoices.status,
         customers.name,
         customers.email,
-        customers.image_url
-        SUM(invoice_items.quantity) AS quantity
+        customers.image_url,
+        SUM(invoice_items.quantity) AS quantity,
+        STRING_AGG(products.nama_produk, ', ') AS nama_produk
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
+      LEFT JOIN invoice_items ON invoices.id = invoice_items.invoice_id
+      LEFT JOIN products ON products.id_produk = invoice_items.product_id
       WHERE
         customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
         invoices.date::text ILIKE ${`%${query}%`} OR
         invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+      GROUP BY
+        invoices.id,
+        invoices.amount,
+        invoices.date,
+        invoices.status,
+        customers.name,
+        customers.email,
+        customers.image_url
+      ORDER BY 
+        invoices.id DESC,
+        invoices.date DESC
+      LIMIT ${minItemsPerPage} OFFSET ${offset};
     `;
 
     return invoices;
@@ -149,6 +164,7 @@ export async function fetchFilteredInvoices(
     throw new Error('Failed to fetch invoices.');
   }
 }
+
 
 export async function fetchInvoicesPages(query: string) {
   try {
@@ -168,6 +184,53 @@ export async function fetchInvoicesPages(query: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of invoices.');
+  }
+}
+
+export async function fetchFilteredProducts(query: string, currentPage: number) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const products = await sql<Product[]>`
+      SELECT
+        id_produk,
+        nama_produk,
+        harga,
+        stok,
+        foto,
+        deskripsi
+      FROM products
+      WHERE
+        nama_produk ILIKE ${`%${query}%`} OR
+        deskripsi ILIKE ${`%${query}%`}
+      ORDER BY nama_produk ASC
+      LIMIT ${ITEMS_PER_PAGE}
+      OFFSET ${offset};
+    `;
+
+    return products;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch filtered products.');
+  }
+}
+
+
+export async function fetchProductsPages(query: string) {
+  try {
+    const data = await sql`
+      SELECT COUNT(*)
+      FROM products
+      WHERE
+        nama_produk ILIKE ${`%${query}%`} OR
+        deskripsi ILIKE ${`%${query}%`}
+    `;
+
+    const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of products.');
   }
 }
 
@@ -246,7 +309,7 @@ export async function fetchFilteredCustomers(query: string) {
   }
 }
 
-export async function fetchProducts() {
+export async function fetchProducts(query: string = '') {
   try {
     const products = await sql<Product[]>`
       SELECT
@@ -257,6 +320,7 @@ export async function fetchProducts() {
         foto,
         deskripsi
       FROM products
+      WHERE LOWER(nama_produk) LIKE ${'%' + query.toLowerCase() + '%'}
       ORDER BY nama_produk ASC
     `;
 
@@ -270,7 +334,7 @@ export async function fetchProducts() {
 // Ambil 1 produk berdasarkan ID
 export async function fetchProductById(id: string) {
   try {
-    const data = await sql<Product[]>`
+    const data = await sql<ProductField[]>`
       SELECT
         id_produk,
         nama_produk,
@@ -353,31 +417,28 @@ export async function deleteProductById(id: string) {
   }
 }
 
-export async function fetchInvoices(): Promise<any[]> {
+export async function fetchInvoices(page: number, query: string = '') {
+  const offset = (page - 1) * ITEMS_PER_PAGE;
+
   try {
     const invoices = await sql`
-      SELECT
-        invoices.id,
-        invoices.customer_id,
-        customers.name,
-        customers.email,
-        customers.image_url,
-        invoices.date,
-        invoices.amount,
-        invoices.status,
-        products.nama_produk,
-        invoices.quantity
+      SELECT invoices.*, customers.name AS customer_name, customers.email
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
-      JOIN invoice_items ON invoice_items.invoice_id = invoices.id
-      JOIN products ON invoice_items.product_id = products.id_produk
+      WHERE
+        customers.name ILIKE ${'%' + query + '%'} OR
+        customers.email ILIKE ${'%' + query + '%'} OR
+        invoices.amount::text ILIKE ${'%' + query + '%'} OR
+        invoices.date::text ILIKE ${'%' + query + '%'} OR
+        invoices.status ILIKE ${'%' + query + '%'}
       ORDER BY invoices.date DESC
-      LIMIT 20
+      LIMIT ${ITEMS_PER_PAGE}
+      OFFSET ${offset}
     `;
     return invoices;
   } catch (error) {
-    console.error('Database error fetching invoices:', error);
-    throw new Error('Failed to fetch invoices');
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
   }
 }
 

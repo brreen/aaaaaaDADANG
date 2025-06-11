@@ -1,4 +1,4 @@
-import { CustomerField } from '@/app/lib/definitions';
+import { CustomerField, ProductField } from '@/app/lib/definitions';
 import Link from 'next/link';
 import {
   CheckIcon,
@@ -7,10 +7,13 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
+import { createInvoice } from '@/app/lib/actions';
+import products from '../home-adpro/products';
 
-export default function Form({ customers }: { customers: CustomerField[] }) {
+export default function Form({ customers, products }: { customers: CustomerField[]; products: ProductField[] }) {
+
   return (
-    <form>
+    <form action={createInvoice}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -57,6 +60,53 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
           </div>
         </div>
 
+        {/* Customer Email */}
+<div className="mb-4">
+  <label htmlFor="email" className="mb-2 block text-sm font-medium">
+    Email
+  </label>
+  <input
+    id="email"
+    name="email"
+    type="email"
+    placeholder="Enter customer email"
+    className="block w-full rounded-md border border-gray-200 py-2 px-3 text-sm outline-2 placeholder:text-gray-500"
+    required
+  />
+</div>
+
+{/* Product Quantity */}
+<div className="mb-4">
+  <label htmlFor="quantity" className="mb-2 block text-sm font-medium">
+    Quantity
+  </label>
+  <input
+    id="quantity"
+    name="quantity"
+    type="number"
+    min="1"
+    placeholder="Enter quantity"
+    className="block w-full rounded-md border border-gray-200 py-2 px-3 text-sm outline-2 placeholder:text-gray-500"
+    required
+  />
+</div>
+
+{/* Product Name */}
+<div className="mb-4">
+  <label htmlFor="name" className="mb-2 block text-sm font-medium">
+    Product Name
+  </label>
+  <select name="product_id" id="product" required>
+        <option value="">-- Pilih Produk --</option>
+        {products.map(product => (
+          <option key={product.id_produk} value={product.id_produk}>
+            {product.nama_produk}
+          </option>
+        ))}
+      </select>
+</div>
+
+
         {/* Invoice Status */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
@@ -100,7 +150,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/invoices"
+          href="/Admin/Transaction"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
