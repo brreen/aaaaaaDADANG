@@ -1,23 +1,22 @@
-import { fetchProductsPages } from '@/app/lib/data';
-import Pagination from '@/app/ui/home-adpro/pagination';
-import ProductsTable from '@/app/ui/home-cus/table';
-import Search from '@/app/ui/search';
-import { ProductTableSkeleton } from '@/app/ui/skeletons';
-import { Suspense } from 'react';
+import { fetchProductsPages } from "@/app/lib/data";
+import Pagination from "@/app/ui/home-adpro/pagination";
+import ProductsTable from "@/app/ui/home-cus/table";
+import Search from "@/app/ui/search";
+import { ProductTableSkeleton } from "@/app/ui/skeletons";
+import { Suspense } from "react";
 
-export const dynamic = 'force-dynamic';
-
-export default async function customerProductPage(props: {
+export default async function customerProductPage({
+  searchParams,
+}: {
   searchParams?: Promise<{
     query?: string;
     page?: string;
   }>;
 }) {
-  const searchParams = await props.searchParams;
-  const query = searchParams?.query || '';
-  const currentPage = Number(searchParams?.page) || 1;
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams?.query || '';
+  const currentPage = Number(resolvedSearchParams?.page) || 1;
   const totalPages = await fetchProductsPages(query);
-
 
   return (
     <main className="p-6">
