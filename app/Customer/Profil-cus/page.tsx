@@ -1,5 +1,11 @@
-import React, { Suspense } from 'react';
-import CustomerProfilPage from './CustomerProfilPage';
+'use client';
+
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+const CustomerProfilPage = dynamic(() => import('./CustomerProfilPage'), {
+  ssr: false, // ⛔️ Matikan server-side rendering
+});
 
 export default function Page() {
   return (
