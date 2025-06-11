@@ -1,8 +1,8 @@
+// app/Customer/Profil-cus/CustomerProfilPage.tsx
 'use client';
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
 
 export default function CustomerProfilPage() {
   const router = useRouter();
@@ -16,10 +16,7 @@ export default function CustomerProfilPage() {
   };
 
   const handleLogout = () => {
-    // Hapus token login (localStorage/sessionStorage/cookies sesuai implementasi)
     localStorage.removeItem('token');
-
-    // Arahkan kembali ke halaman login
     router.push('/Auth/Login');
   };
 
