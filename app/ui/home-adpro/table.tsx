@@ -50,7 +50,7 @@ export default async function ProductsTable({
                 </div>
                 <div className="mt-2 flex justify-end gap-2">
                   <UpdateProduct id_produk={product.id_produk} />
-                  <DeleteProduct id={product.id_produk} />
+                  <DeleteProduct id_produk={product.id_produk} />
                 </div>
               </div>
             ))}
@@ -87,7 +87,7 @@ export default async function ProductsTable({
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
                       <UpdateProduct id_produk={product.id_produk} />
-                      <DeleteProduct id={product.id_produk} />
+                      <DeleteProduct id_produk={product.id_produk} />
                     </div>
                   </td>
                 </tr>

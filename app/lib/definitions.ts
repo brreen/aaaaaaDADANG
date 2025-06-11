@@ -56,9 +56,11 @@ export type InvoicesTable = {
   name: string;
   email: string;
   image_url: string;
-  quantity: number;   // hasil SUM dari invoice_items.quantity
-  customer_id?: string;  // jika diperlukan
+  quantity: number;             // hasil SUM dari invoice_items.quantity
+  nama_produk: string;          // hasil STRING_AGG dari nama produk
+  customer_id?: string;         // opsional
 };
+
 
 
 export type CustomersTableType = {

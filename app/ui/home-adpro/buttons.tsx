@@ -26,8 +26,8 @@ export function UpdateProduct({ id_produk }: { id_produk: string }) {
   );
 }
 
-export function DeleteProduct({ id }: { id: string }) {
-  const deleteProductWithId = deleteProduct.bind(null, id);
+export function DeleteProduct({ id_produk }: { id_produk: string }) {
+  const deleteProductWithId = deleteProduct.bind(null, id_produk);
  
   return (
     <form action={deleteProductWithId}>

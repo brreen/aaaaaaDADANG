@@ -31,7 +31,7 @@ export default function InvoicesTable({
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200">
           {/* Mobile view */}
-          <div className="md:hidden p-2 space-y-2">
+          {/* <div className="md:hidden p-2 space-y-2">
             {invoices.map((invoice) => (
               <div
                 key={invoice.id}
@@ -55,7 +55,7 @@ export default function InvoicesTable({
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* Desktop view */}
           <table className="hidden min-w-full divide-y divide-gray-200 md:table">
@@ -73,14 +73,12 @@ export default function InvoicesTable({
             <tbody className="divide-y divide-gray-100 text-sm text-gray-700 bg-white">
               {invoices.map((invoice) => (
                 <tr key={invoice.id}>
-                  <td className="whitespace-nowrap px-4 py-3 font-medium">{invoice.name}</td>
-                  <td className="whitespace-nowrap px-4 py-3">{invoice.email}</td>
-                  <td className="whitespace-nowrap px-4 py-3">{formatCurrency(invoice.amount)}</td>
-                  <td className="whitespace-nowrap px-4 py-3">{invoice.quantity}</td>
-                  <td className="whitespace-nowrap px-4 py-3">{formatDateToLocal(invoice.date)}</td>
-                  <td className="whitespace-nowrap px-4 py-3">
-                    <InvoiceStatus status={invoice.status} />
-                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 font-medium"> {invoice.name} </td> 
+                  <td className="whitespace-nowrap px-4 py-3"> {invoice.email} </td> 
+                  <td className="whitespace-nowrap px-4 py-3"> {formatCurrency(invoice.amount)} </td> 
+                  <td className="whitespace-nowrap px-4 py-3"> {invoice.quantity } </td> 
+                  <td className="whitespace-nowrap px-4 py-3"> {formatDateToLocal(invoice.date)} </td> 
+                  <td className="whitespace-nowrap px-4 py-3"> <InvoiceStatus status={invoice.status} /> </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
                       <UpdateInvoice id={invoice.id} />

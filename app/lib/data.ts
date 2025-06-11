@@ -129,29 +129,18 @@ export async function fetchFilteredInvoices(
         invoices.amount,
         invoices.date,
         invoices.status,
+        invoices.quantity, -- langsung ambil dari tabel invoices
         customers.name,
         customers.email,
-        customers.image_url,
-        SUM(invoice_items.quantity) AS quantity,
-        STRING_AGG(products.nama_produk, ', ') AS nama_produk
+        customers.image_url
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
-      LEFT JOIN invoice_items ON invoices.id = invoice_items.invoice_id
-      LEFT JOIN products ON products.id_produk = invoice_items.product_id
       WHERE
         customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
         invoices.date::text ILIKE ${`%${query}%`} OR
         invoices.status ILIKE ${`%${query}%`}
-      GROUP BY
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
       ORDER BY 
         invoices.id DESC,
         invoices.date DESC
@@ -164,6 +153,7 @@ export async function fetchFilteredInvoices(
     throw new Error('Failed to fetch invoices.');
   }
 }
+
 
 
 export async function fetchInvoicesPages(query: string) {
@@ -191,7 +181,7 @@ export async function fetchFilteredProducts(query: string, currentPage: number) 
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const products = await sql<Product[]>`
+    const products = await sql<ProductField[]>`
       SELECT
         id_produk,
         nama_produk,
@@ -356,19 +346,19 @@ export async function fetchProductById(id: string) {
 export async function fetchMostSoldProducts() {
   try {
     const products = await sql<any[]>`
-        SELECT 
+      SELECT 
         p.id_produk,
         p.nama_produk,
         p.harga,
         p.stok,
         p.foto,
         p.deskripsi,
-        SUM(i.quantity) AS quantity
+        SUM(ii.quantity) AS quantity
       FROM products p
-      JOIN invoices i ON p.id_produk = i.id_produk
+      JOIN invoice_items ii ON p.id_produk = ii.product_id
       GROUP BY p.id_produk, p.nama_produk, p.harga, p.stok, p.foto, p.deskripsi
       ORDER BY quantity DESC
-      LIMIT 3;  
+      LIMIT 3;
     `;
 
     return products.map(product => ({
@@ -380,6 +370,7 @@ export async function fetchMostSoldProducts() {
     throw new Error('Failed to fetch most sold products.');
   }
 }
+
 
 
 
