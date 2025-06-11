@@ -216,13 +216,17 @@ export async function fetchProductsPages(query: string) {
         deskripsi ILIKE ${`%${query}%`}
     `;
 
+    // Perbaikan: akses langsung data[0].count karena data sudah berupa array
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
+    console.error('Query that failed:', query);
+    console.error('Full error details:', error);
     throw new Error('Failed to fetch total number of products.');
   }
 }
+
 
 export async function fetchInvoiceById(id: string) {
   try {
