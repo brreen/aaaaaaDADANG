@@ -45,18 +45,17 @@ export default function AboutPage() {
                   index < developers.length - 1 ? 'border-b border-gray-100' : ''
                 }`}
               >
-                <div className="w-20 h-20 rounded-full overflow-hidden mr-4 relative">
-                  {/* Use Next.js Image component with proper error handling */}
-                  <Image
-                    src={developer.imageSrc}
-                    alt={`${developer.name} profile photo`}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
+               <div className="w-20 h-20 rounded-full overflow-hidden mr-4 relative bg-gray-200 flex items-center justify-center">
+                <img
+                  src={developer.imageSrc}
+                  alt={`${developer.name} profile photo`}
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    e.currentTarget.src = '/fallback-profile.png'; // Buat gambar fallback di public/
+                  }}
+                />
+
+
                   <div className={`${developer.bgColor} w-full h-full absolute inset-0 flex items-center justify-center -z-10`}>
                     <span className="text-white text-xs">Profile Photo</span>
                   </div>
