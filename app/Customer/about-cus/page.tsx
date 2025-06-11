@@ -54,14 +54,13 @@ export default function AboutPage() {
                     sizes="80px"
                     className="object-cover"
                     onError={(e) => {
-                      // Fallback styling happens via CSS when image fails to load
                       e.currentTarget.style.display = 'none';
                     }}
                   />
-                  {/* Fallback if image fails to load */}
                   <div className={`${developer.bgColor} w-full h-full absolute inset-0 flex items-center justify-center -z-10`}>
                     <span className="text-white text-xs">Profile Photo</span>
                   </div>
+
                 </div>
                 <div className="flex-grow">
                   <p className="text-gray-500 text-sm">Username</p>
