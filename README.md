@@ -1,5 +1,19 @@
-## Next.js App Router Course - Starter
+Anggota Kelompok:
+Berren Yesra Wibowo (231712353)
+Robin Jauhari (231712550)
+Evaan Abel Lesmana (231712601)
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
+Deskripsi proyek:
+Florea adalah sebuah toko bunga online yang menyediakan berbagai rangkaian bunga. Dengan sistem pemesanan yang mudah melalui website dan pengiriman cepat ke berbagai wilayah, Florea hadir untuk mengutamakan kualitas bunga, desain rangkaian yang elegan, serta pelayanan pelanggan yang responsif dan ramah.
 
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+Link Deploy Vercel:
+https://nextjs-dashboard-flgh.vercel.app/Auth/Login
+
+username pelanggan:
+user123
+password:
+12345
+username admin:
+admin123
+password:
+12345
